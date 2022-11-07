@@ -36,7 +36,7 @@ public:
     }
 
     T* operator+(size_t offset) noexcept {
-        // It is allowed to get the address of the memory cell following the last element of the array
+        // Разрешается получать адрес ячейки памяти, следующей за последним элементом массива
         assert(offset <= capacity_);
         return buffer_ + offset;
     }
@@ -72,12 +72,12 @@ public:
     }
 
 private:
-    // Allocates raw memory for n elements and returns a pointer to it
+    // Выделяет сырую память под n элементов и возвращает указатель на неё
     static T* Allocate(size_t n) {
         return n != 0 ? static_cast<T*>(operator new(n * sizeof(T))) : nullptr;
     }
 
-    // Frees the raw memory allocated earlier at the buf address using Allocate
+    // Освобождает сырую память, выделенную ранее по адресу buf при помощи Allocate
     static void Deallocate(T* buf) noexcept {
         operator delete(buf);
     }
@@ -221,8 +221,10 @@ public:
     }
 
     void PopBack() /* noexcept */ {
-        std::destroy_at(data_ + (size_ - 1));
-        --size_;
+        if (size_ != 0) {
+            std::destroy_at(data_ + (size_ - 1));
+            --size_;
+        }
     }
 
     template <typename... Args>
@@ -248,25 +250,9 @@ public:
         }
         size_t position_new_element = pos - cbegin();
         if (size_ == Capacity()) {
-            RawMemory<T> new_data(size_ == 0 ? 1 : size_ * 2);
-            new (new_data + position_new_element) T(std::forward<Args>(args)...);
-
-            if constexpr (std::is_nothrow_move_constructible_v<T> || !std::is_copy_constructible_v<T>) {
-                std::uninitialized_move_n(data_.GetAddress(), position_new_element, new_data.GetAddress());
-                std::uninitialized_move_n(data_ + position_new_element, size_ - position_new_element, new_data + position_new_element + 1);
-            } else {
-                std::uninitialized_copy_n(data_.GetAddress(), position_new_element, new_data.GetAddress());
-                std::uninitialized_copy_n(data_ + position_new_element, size_ - position_new_element, new_data + position_new_element + 1);
-            }
-
-            std::destroy_n(data_.GetAddress(), size_);
-            data_.Swap(new_data);
-
+            Realocation(position_new_element, std::forward<Args>(args)...);
         } else {
-            T tmp(std::forward<Args>(args)...);
-            new (data_ + size_) T(std::move(*std::prev(end())));
-            std::move_backward(data_ + position_new_element, end() - 1, end());
-            data_[position_new_element] = std::move(tmp);
+            Moving(position_new_element, std::forward<Args>(args)...);
         }
         ++size_;
         return &data_[position_new_element];
@@ -305,6 +291,31 @@ private:
         }
         std::destroy_n(data_.GetAddress(), size_);
         data_.Swap(new_data);
+    }
+
+    template <typename... Args>
+    void Realocation(size_t position_new_element, Args&&... args) {
+        RawMemory<T> new_data(size_ == 0 ? 1 : size_ * 2);
+        new (new_data + position_new_element) T(std::forward<Args>(args)...);
+
+        if constexpr (std::is_nothrow_move_constructible_v<T> || !std::is_copy_constructible_v<T>) {
+            std::uninitialized_move_n(data_.GetAddress(), position_new_element, new_data.GetAddress());
+            std::uninitialized_move_n(data_ + position_new_element, size_ - position_new_element, new_data + position_new_element + 1);
+        } else {
+            std::uninitialized_copy_n(data_.GetAddress(), position_new_element, new_data.GetAddress());
+            std::uninitialized_copy_n(data_ + position_new_element, size_ - position_new_element, new_data + position_new_element + 1);
+        }
+
+        std::destroy_n(data_.GetAddress(), size_);
+        data_.Swap(new_data);
+    }
+
+    template <typename... Args>
+    void Moving(size_t position_new_element, Args&&... args) {
+        T tmp(std::forward<Args>(args)...);
+        new (data_ + size_) T(std::move(*std::prev(end())));
+        std::move_backward(data_ + position_new_element, end() - 1, end());
+        data_[position_new_element] = std::move(tmp);
     }
 private:
     RawMemory<T> data_;
