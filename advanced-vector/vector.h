@@ -321,3 +321,14 @@ private:
     RawMemory<T> data_;
     size_t size_ = 0;
 };
+
+namespace tests {
+    void Test1();
+    void Test2();
+    void Test3();
+    void Test4();
+    void Test5();
+    void Test6();
+    void Benchmark();
+    void RunAllTests();
+} // namespace tests
