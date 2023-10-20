@@ -139,7 +139,7 @@ public:
         std::uninitialized_value_construct_n(data_.GetAddress(), size);
     }
 
-    Vector(const Vector& other) 
+    Vector(const Vector& other)
         : data_(other.size_)
         , size_(other.size_) {
         std::uninitialized_copy_n(other.data_.GetAddress(), size_, data_.GetAddress());
