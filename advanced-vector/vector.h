@@ -287,9 +287,8 @@ T& Vector<T>::EmplaceBack(Args&&... args) {
 template <typename T>
 template <typename... Args>
 typename Vector<T>::iterator Vector<T>::Emplace(const_iterator pos, Args&&... args) {
-    // ¬ызываетс€ EmplaceBack, т.к. там меньше действий.
-    // ћожно было бы вызывать в EmplaceBack Emplace и передавать туда end(),
-    // но так проиграем в количестве выполн€емых операций
+    //  ак вариант, можно было бы вызывать в EmplaceBack Emplace, передава€ в него end(),
+    // но текуща€ реализаци€ позвол€ет снизить нагрузку на этот метод
     if (pos == cend()) {
         return &EmplaceBack(std::forward<Args>(args)...);
     }
@@ -320,9 +319,7 @@ typename Vector<T>::iterator Vector<T>::Erase(const_iterator pos) noexcept(std::
 
 template <typename T>
 void Vector<T>::SwapRealocation(RawMemory<T>& new_data) {
-    // если конструктор перемещени€ типа T не выбрасывает исключений
-    // или тип T не имеет копирующего конструктора.
-    // constexpr оператор if будет вычислен во врем€ компил€ции
+    // ≈сли конструктор перемещени€ типа “ не выбрасывает исключений или тип “ не имеет копирующего конструктора
     if constexpr (std::is_nothrow_move_constructible_v<T> || !std::is_copy_constructible_v<T>) {
         std::uninitialized_move_n(data_.GetAddress(), size_, new_data.GetAddress());
     } else {
