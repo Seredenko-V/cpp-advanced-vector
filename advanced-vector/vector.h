@@ -72,12 +72,12 @@ public:
     }
 
 private:
-    // Выделяет сырую память под n элементов и возвращает указатель на неё
+    // Allocates raw memory for n elements and returns a pointer to it
     static T* Allocate(size_t n) {
         return n != 0 ? static_cast<T*>(operator new(n * sizeof(T))) : nullptr;
     }
 
-    // Освобождает сырую память, выделенную ранее по адресу buf при помощи Allocate
+    // Frees the raw memory allocated earlier at the buf address using Allocate
     static void Deallocate(T* buf) noexcept {
         operator delete(buf);
     }
@@ -287,8 +287,8 @@ T& Vector<T>::EmplaceBack(Args&&... args) {
 template <typename T>
 template <typename... Args>
 typename Vector<T>::iterator Vector<T>::Emplace(const_iterator pos, Args&&... args) {
-    // Как вариант, можно было бы вызывать в EmplaceBack Emplace, передавая в него end(),
-    // но текущая реализация позволяет снизить нагрузку на этот метод
+    // Alternatively, it would be possible to call "Emplace Back" to "Emplace" by passing end() to it,
+    // but the current implementation reduces the load on this method
     if (pos == cend()) {
         return &EmplaceBack(std::forward<Args>(args)...);
     }
@@ -319,7 +319,7 @@ typename Vector<T>::iterator Vector<T>::Erase(const_iterator pos) noexcept(std::
 
 template <typename T>
 void Vector<T>::SwapRealocation(RawMemory<T>& new_data) {
-    // Если конструктор перемещения типа Т не выбрасывает исключений или тип Т не имеет копирующего конструктора
+    // If the move constructor of type T does not throw exceptions or type T does not have a copy constructor
     if constexpr (std::is_nothrow_move_constructible_v<T> || !std::is_copy_constructible_v<T>) {
         std::uninitialized_move_n(data_.GetAddress(), size_, new_data.GetAddress());
     } else {
