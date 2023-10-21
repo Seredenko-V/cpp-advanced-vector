@@ -24,4 +24,4 @@
 * C++17
 
 ## UML-диаграмма
-![UML](https://raw.githubusercontent.com/Seredenko-V/cpp-advanced-vector/7816afcf2db6d2bb96b2620ac1b9f8b7dc8afb66/uml-advanced-vector.svg?token=AWESMY5BE5G42WEH4MC65ITFGQJGC "UML-diagram Vector")
+![UML](https://raw.githubusercontent.com/Seredenko-V/cpp-advanced-vector/6181d334a8155764bfcd7bf64e8cd5f400793abe/uml-advanced-vector.svg?token=AWESMYZHSWGCLUQ7UUFC3ETFGQJXC "UML-diagram Vector")
