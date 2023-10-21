@@ -36,7 +36,7 @@ public:
     }
 
     T* operator+(size_t offset) noexcept {
-        // Разрешается получать адрес ячейки памяти, следующей за последним элементом массива
+        // It is allowed to get the address of the memory cell following the last element of the array
         assert(offset <= capacity_);
         return buffer_ + offset;
     }
@@ -67,7 +67,7 @@ public:
         return buffer_;
     }
 
-    size_t Capacity() const {
+    size_t Capacity() const noexcept {
         return capacity_;
     }
 

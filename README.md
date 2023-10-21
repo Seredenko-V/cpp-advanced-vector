@@ -1,7 +1,8 @@
-# Вектор
+# Vector
 Учебный проект в рамках [курса](https://practicum.yandex.ru/cpp/?from=catalog) Яндекс Практикума, аналог [std::vector](https://en.cppreference.com/w/cpp/container/vector).  
 Осуществляется работа с сырой памятью посредством использования [размещающего оператора new](https://en.cppreference.com/w/cpp/memory/new/operator_new), 
-`std::uninitialized_*` и `destroy*`.  
+`std::uninitialized_*` и `destroy*`.  Также используются [Variadic Templates](https://en.cppreference.com/w/cpp/language/parameter_pack) 
+(вариативные шаблоны) в методах `Emplace` и `EmplaceBack`.
 * `RawMemory` является обёрткой над сырой памятью.  
 * Методы `Insert` и `Emplace` при вставке элемента в конец вектора обеспечивают строгую гарантию безопасности исключений, 
 когда выполняется любое из условий:
@@ -23,4 +24,4 @@
 * C++17
 
 ## UML-диаграмма
-![UML](https://raw.githubusercontent.com/Seredenko-V/cpp-simple-vector/06892519bcb94f244fbe8880da51e6f7500b60db/uml-simple-vector.svg?token=AWESMY7ZQTJZT6FTH6FZPG3E4MGBK "UML-diagram simple-vector")
+
